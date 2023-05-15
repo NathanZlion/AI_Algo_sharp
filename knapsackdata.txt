@@ -1,0 +1,22 @@
+100
+Item,weight,value,n_items
+Smartphone,0.15,500,5
+Laptop,2.5,1500,3
+Smartwatch,0.1,200,10
+Bluetooth Speaker,0.8,100,8
+Wireless Earbuds,0.05,150,12
+Digital Camera,1.2,800,4
+Tablet,1.8,1200,2
+E-reader,0.3,250,6
+Portable Power Bank,0.3,50,20
+Travel Backpack,1.5,100,5
+Gaming Console,3.2,1000,2
+External Hard Drive,0.25,150,8
+Drone,1.7,800,3
+Fitness Tracker,0.05,80,15
+Headphones,0.3,120,10
+Virtual Reality Headset,0.6,300,5
+Bluetooth Keyboard,0.4,70,10
+Wireless Mouse,0.1,40,20
+Camera Lens,0.8,500,3
+Portable Speaker,0.6,80,15
