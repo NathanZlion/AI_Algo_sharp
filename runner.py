@@ -260,6 +260,7 @@ Options:
     --file <file_path>                  Specify the file path for the problem (default: knapsackdata.txt for knapsack, tspdata.txt for tsp)
     --num-of-items <number_of_items>    Specify the number of items (default: 10 for knapsack, 16 for tsp)
     --experiment                        Display a graph of the runtime comparision 
+    --all                               Run all algorithms at once
     --verbose                           Enable verbose mode for detailed output
     --num-of-generations <num_generations>       Set the number of generations for genetic algorithm(default: 1000)
     --population-size <population_size> Set the population size for genetic algorithm (default: 100)
@@ -280,7 +281,7 @@ def plot_graph(number_of_items, runtime, fitness_value, algorithm):
     # Add labels and runtime on top of each bar
     for i in range(len(number_of_items)):
         plt.text(number_of_items[i], runtime[i], f'Runtime: {runtime[i]*1000:.2f}ms', ha='center', va='top')
-        plt.text(number_of_items[i], runtime[i], f'Fitness :  {fitness_value[i]:.2f}', ha='center', va='bottom')
+        plt.text(number_of_items[i], runtime[i], f'value: {fitness_value[i]:.2f}', ha='center', va='bottom')
 
     # Set the x-axis and y-axis labels
     plt.xlabel('Number of Items')
