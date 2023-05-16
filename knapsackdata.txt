@@ -1,4 +1,4 @@
-100
+50
 Item,weight,value,n_items
 Smartphone,0.15,500,5
 Laptop,2.5,1500,3

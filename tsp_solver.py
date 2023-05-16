@@ -5,12 +5,11 @@ from util import *
 
 class Tsp_problem:
 
-    def __init__(self, file, number_of_cities=10):
+    def __init__(self, file, number_of_items= None):
+        self.number_of_items = number_of_items or 16
         self.city_map = tsp_file_parser(file)
         self.city_graph = self.__build_city_graph()
-        # randomly choose cities of the given number
-        self.cities = sample(list(self.city_graph.get_nodes().keys()), number_of_cities)
-        # randomly choose a city to start with and finish there too
+        self.cities = sample(list(self.city_graph.get_nodes().keys()), self.number_of_items)
         self.start_city = choice(self.cities)
         self.between_cities_distance = self.__get_distance_between_cities()
         self.curr_state = generate_initial_tsp_state(self.cities)
@@ -20,7 +19,7 @@ class Tsp_problem:
         self.best_state_fitness = self.curr_state_fitness
 
 
-    def hillclimbing(self):
+    def hillclimbing(self, verbose = False):
         """
         Hill Climbing algorithm for TSP
         """
@@ -31,12 +30,13 @@ class Tsp_problem:
             self.best_state = best_neighbor
             self.best_state_fitness = get_fitness_tsp(best_neighbor, self.between_cities_distance)
 
-        print_analytics_tsp(self.city_graph, self.curr_state, self.best_state, self.between_cities_distance, self.cities, self.start_city)
+            if verbose:
+                print("    Fitness:", get_fitness_tsp(self.best_state, self.between_cities_distance), end="\r")
 
+    def simulated_annealing(self, initial_temperature= None, cooling_rate= None,verbose = False):
+        temperature = initial_temperature or 20
+        COOLING_RATE = cooling_rate or 0.9999
 
-    def simulated_annealing(self):
-        temperature = 20
-        COOLING_RATE = 0.9999
 
         # start With a high temperature
         while temperature > 0.01:
@@ -59,25 +59,27 @@ class Tsp_problem:
                 self.best_state = self.curr_state[:]
                 self.best_state_fitness = self.curr_state_fitness
 
+            if verbose:
+                print(" ~   Temp: " + "{:.2f}".format(temperature), " ||  Best Path Distance:", get_fitness_tsp(self.best_state, self.between_cities_distance) , "_" , end="\r")
 
-            # print("Temp: " + "{:.2f}".format(temperature), " ||  Best Path Distance:", get_fitness_tsp(self.best_state, self.between_cities_distance))
-                        # uncomment the above line ^^^^ to see the process of the algorithm
             temperature *= COOLING_RATE
 
-        print_analytics_tsp(self.city_graph, self.initial_state, self.best_state, self.between_cities_distance, self.cities, self.start_city)
 
+    def genetic_algorithm(self, population_size= None, max_generations= None, crossover_rate= None, mutation_rate= None, verbose = False):
+        POPULATION_SIZE = population_size or 100
+        MAX_GENERATIONS = max_generations or 2000
+        CROSSOVER_RATE = crossover_rate or 0.8
+        MUTATION_RATE = mutation_rate or 0.2
 
-    def genetic_algorithm(self):
-        POPULATION_SIZE = 100
-        MAX_GENERATIONS = 1000
-        CROSSOVER_RATE = 0.8
-        MUTATION_RATE = 0.2
         # generate a random population
         curr_population = [generate_initial_tsp_state(self.cities) for _ in range(POPULATION_SIZE)]
         # generation 0 sorted by value
         curr_population = sorted(curr_population, key=lambda x: get_fitness_tsp(x, self.between_cities_distance))
+        initial_state = curr_population[0]
+        best_state = curr_population[0]
+        best_state_fitness = get_fitness_tsp(best_state, self.between_cities_distance)
         
-        for generation in range(MAX_GENERATIONS):
+        for generation in range(MAX_GENERATIONS+1):
             # generate the next generation
             next_generation = []
             for _ in range(POPULATION_SIZE//2):
@@ -96,18 +98,27 @@ class Tsp_problem:
             current_best_state = combined_curr_population[0]
             current_best_state_fitness = get_fitness_tsp(current_best_state, self.between_cities_distance)
 
-            if current_best_state_fitness < self.best_state_fitness:
-                self.best_state = current_best_state[:]
-                self.best_state_fitness = current_best_state_fitness
+            if current_best_state_fitness < best_state_fitness:
+                best_state = current_best_state[:]
+                best_state_fitness = current_best_state_fitness
 
             curr_population = combined_curr_population
 
-            # print(f'Gen: {generation}, {" " * (4-len(str(generation)))} {get_fitness_tsp(self.best_state, self.between_cities_distance)}')
-                        # uncomment the above line ^^^^ to see the process of the algorithm
+            if verbose:
+                print(f'    Gen: {generation}, {" " * (4-len(str(generation)))} ||  Best Path Distance: {get_fitness_tsp(best_state, self.between_cities_distance)}',  end="\r")
 
-        print_analytics_tsp(self.city_graph, self.initial_state, self.best_state, self.between_cities_distance, self.cities, self.start_city)    
+        return initial_state, best_state
 
-    
+    def clear(self):
+        self.cities = sample(list(self.city_graph.get_nodes().keys()), self.number_of_items)
+        self.start_city = choice(self.cities)
+        self.between_cities_distance = self.__get_distance_between_cities()
+        self.curr_state = generate_initial_tsp_state(self.cities)
+        self.curr_state_fitness = get_fitness_tsp(self.curr_state, self.between_cities_distance)
+        self.initial_state = self.curr_state[:]
+        self.best_state = self.curr_state
+        self.best_state_fitness = self.curr_state_fitness
+
     def __build_city_graph(self):
         """
         Build a graph of cities and their distances

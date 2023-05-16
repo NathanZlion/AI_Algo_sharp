@@ -1,5 +1,4 @@
 
-
 # This module contains utility functions for the project.
 
 from collections import defaultdict
@@ -11,7 +10,7 @@ from Modules.graph import Graph
 ###################################################
 #     UTILITY FUNCTIONS FOR KNAPSACK PROBLEM      #
 ###################################################
-def knapsack_file_parser(filename: str) -> tuple:
+def knapsack_file_parser(filename: str, number_of_items = 10) -> tuple:
     """
     Sample file format:
     ```
@@ -30,6 +29,9 @@ def knapsack_file_parser(filename: str) -> tuple:
             knapsack_weight_limit = int(lines[0])
             items = []
             for line in lines[2:]:
+                if number_of_items == 0:
+                    break
+                number_of_items -= 1
                 item = line.split(",")
                 for _ in range(int(item[3])):
                     # itemname, itemweight, itemvalue
@@ -124,6 +126,7 @@ def print_analytics_knapsack(intitial_state : list, final_state: list, items: li
     Prints the analytics of the algorithm, The initial and final state of the knapsack.
     The items in it. The total weight and value of the items in the knapsack.
     """
+    print("\n######################\n")
     print(f'Maximum weight: {knapsack_weight_limit}')
     print("\n####### Initial State ######\n") 
     __print_items_in_knapsack(intitial_state, items)
@@ -145,9 +148,10 @@ def __print_items_in_knapsack(state: list, items: list):
     
     print("Items in the knapsack:")
     for item_name, count in items_count.items():
-        print(f"{item_name} x {count}")
+        print(f"{item_name} x {count}", end=", ")
     
     total_total, total_value = get_items_weight_and_value(state, items)
+    print()
     print(f"Total weight: {total_total}")
     print(f"Total value: {total_value}")
 
@@ -306,8 +310,8 @@ def __print_path_taken(city_graph : Graph,curr_state: list[str], between_cities_
         total_distance += between_cities_distance[(curr_state[index], curr_state[(index + 1) % len(curr_state)])]
     print(curr_state[0])
     print()
-    print(f">>> Total distance: {total_distance}")
-    print(f'>>> Number of cities Passed Through: {total_number_of_cities_crossed}')
+    print(f">>> Total distance: {total_distance} miles")
+    print(f'>>> Number of cities Passed Through: {total_number_of_cities_crossed} cities')
 
 
 def __format_final_path(cities: list, start_city: str):

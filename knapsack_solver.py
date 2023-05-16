@@ -2,31 +2,36 @@
 from util import *
 
 class Knapsack:
-    def __init__(self, file):
-        self.knapsack_weight_limit, self.items =  knapsack_file_parser(file)
-        # select a random state to begin with
+    def __init__(self, file, number_of_items= None):
+        self.number_of_items = number_of_items or 20
+        self.knapsack_weight_limit, self.items =  knapsack_file_parser(file, self.number_of_items)
         self.curr_state = generate_initial_knapsack_state(self.knapsack_weight_limit, self.items)
-        self.initial_state = self.curr_state
+        self.initial_state = self.curr_state[:]
+        self.best_state = self.curr_state[:]
+        self.best_state_fitness = get_items_weight_and_value(self.best_state, self.items)[1]
 
 
-    def hillclimbing(self):
+    def hillclimbing(self, verbose = False):
 
         while True:
             best_neighbor_state = generate_best_immediate_neighbour(self.knapsack_weight_limit, self.curr_state, self.items)
             current_state_value = get_items_weight_and_value(self.curr_state, self.items)[1]
             best_neighbor_value = get_items_weight_and_value(best_neighbor_state, self.items)[1]
+
             if best_neighbor_value > current_state_value:
                 self.curr_state = best_neighbor_state
+                self.best_state = best_neighbor_state
+                self.best_state_fitness = best_neighbor_value
+
             else:
-                # break if a maxima has been reached
                 break
 
-        print_analytics_knapsack(self.initial_state, self.curr_state, self.items, self.knapsack_weight_limit)
+            if verbose:
+                print("    Fitness:", self.best_state_fitness, end="\r")
 
-
-    def simulated_annealing(self):
-        temperature = 20
-        COOLING_RATE = 0.9999
+    def simulated_annealing(self, initial_temperature= None, cooling_rate= None,verbose = False):
+        temperature = initial_temperature or 20
+        COOLING_RATE = cooling_rate or 0.9999
 
         # start With a high temperature
         while temperature > 0.01:
@@ -40,24 +45,29 @@ class Knapsack:
             curr_state_fitness = get_items_weight_and_value(self.curr_state, self.items)[1]
             next_state_fitness = get_items_weight_and_value(next_state, self.items)[1]
 
+            if curr_state_fitness > self.best_state_fitness:
+                self.best_state = self.curr_state[:]
+                self.best_state_fitness = curr_state_fitness
+
             acceptance_prob = acceptance_probability(curr_state_fitness, next_state_fitness, temperature)
 
             if acceptance_prob > random():
                 self.curr_state = next_state
 
-            # print("Temp: " + "{:.2f}".format(temperature), " ||  Fitness:", curr_state_fitness)
-                        # uncomment the above line ^^^^ to see the process of the algorithm
+            if verbose:
+                print("    Temp: " + "{:.2f}".format(temperature), " ||  Fitness:", curr_state_fitness, end="\r")
 
             temperature *= COOLING_RATE
+        
+        self.best_state_fitness = get_items_weight_and_value(self.best_state, self.items)[1]
 
-        print_analytics_knapsack(self.initial_state, self.curr_state, self.items, self.knapsack_weight_limit)
 
+    def genetic_algorithm(self, population_size, max_generations = None, crossover_rate= None, mutation_rate= None, verbose = False):
+        POPULATION_SIZE = population_size or 100
+        MAX_GENERATIONS = max_generations or 1000
+        CROSSOVER_RATE = crossover_rate or 0.8
+        MUTATION_RATE = mutation_rate or 0.2
 
-    def genetic_algorithm(self):
-        POPULATION_SIZE = 100
-        MAX_GENERATIONS = 1000
-        CROSSOVER_RATE = 0.8
-        MUTATION_RATE = 0.2
         # generate a random population
         curr_population = [generate_initial_knapsack_state(self.knapsack_weight_limit, self.items) for _ in range(POPULATION_SIZE)]
         # generation 0 sorted by value
@@ -82,8 +92,16 @@ class Knapsack:
             best_state = combined_curr_population[0]
             curr_population = combined_curr_population
 
-            # print(f'Gen: {generation}, {" " * (4-len(str(generation)))} {get_items_weight_and_value(best_state, self.items)[1]}')
-                        # uncomment the above line ^^^^ to see the process of the algorithm
+            if verbose:
+                print(f'    Gen: {generation}, {" " * (4-len(str(generation)))}  ||  Best total value: {get_items_weight_and_value(best_state, self.items)[1]}', end='\r')
 
-        print_analytics_knapsack(initial_population[0], best_state, self.items, self.knapsack_weight_limit)
+        return initial_population[0], best_state
 
+
+    def clear(self):
+        self.curr_state = generate_initial_knapsack_state(self.knapsack_weight_limit, self.items)
+        self.initial_state = self.curr_state
+        self.best_state = self.curr_state[:]
+        self.best_state_fitness = get_items_weight_and_value(self.best_state, self.items)[1]
+
+        
