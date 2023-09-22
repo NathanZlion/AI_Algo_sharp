@@ -1,6 +1,6 @@
 # Introduction to AI - Assignment I
 
-This repository contains code for the second assignment of the `Introduction to Arteficial Intelligence` course at Addis Ababa Institute of technology. The objectives of the assignment include getting acquinted to Local Search, and being able to solve problems using it which would otherwise have been hard, even impossible to solve.
+This repository contains code for the second assignment of the `Introduction to Artificial Intelligence` course at Addis Ababa Institute of technology. The objectives of the assignment include getting acquinted to Local Search, and being able to solve problems using it which would otherwise have been hard, even impossible to solve.
 
 This project will run experiments to solve the problems using different local search algorithms. To run them use the following command.
 
